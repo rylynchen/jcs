@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function jcs_install() {
+  drupal_set_message(t('You need to do some '.l('config', 'admin/config/user-interface/jcs').' for jcs module.'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function jcs_uninstall() {
+  variable_del('jcs_style_min');
+  variable_del('jcs_style_show');
+}

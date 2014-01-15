@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function jcs_menu() {
+  $items = array();
+  $items['admin/config/user-interface/jcs'] = array(
+    'title' => 'Jcs',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jcs_settings_form'),
+    'access arguments' => array('administer jcs'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'jcs.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function jcs_permission() {
+  return array(
+    'administer jcs' => array(
+      'title' => t('Administer Jcs'),
+      'description' => t('Administer jcs.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function jcs_theme() {
+  return array(
+    'jcs' => array(
+      'variables' => array('images_show' => NULL, 'images_min' => NULL, 'first_title' => NULL),
+      'template' => 'templates/jcs',
+    ),
+  );
+}
+
+/**
+ * Render.
+ *
+ * @param $imgs
+ *
+ * @param $styles
+ *
+ * @return html
+ */
+function jcs_render($imgs, $styles = array(), $link_attr = array()) {
+  $min_style = isset($styles['min']) ? $styles['min'] : variable_get('jcs_style_min', '');
+  $show_style = isset($styles['show']) ? $styles['show'] : variable_get('jcs_style_show', '');
+  $images_show = '';
+  $images_min = '';
+  $first_title = '';
+  $i = 0;
+  foreach ($imgs as $img) {
+    ++$i;
+    if ($i == 1) {
+      $first_title = l($img['title'], $img['href'], array('attributes' => array('target' => '_blank')));
+    }
+    $attr = array('path' => $img['uri'], 'alt' => $img['alt'], 'title' => $img['title']);
+    $show_attr = $attr + array('style_name' => $show_style);
+    $min_attr = $attr + array('style_name' => $min_style);
+    $image_show = theme('image_style', $show_attr);
+    $image_min = theme('image_style', $min_attr);
+    $image = theme('image_style', $attr);
+    $link_attr += array('html' => TRUE, 'attributes' => array('target' => '_blank'));
+    $images_show .= l($image_show, $img['href'], $link_attr);
+    $images_min .= $i == 4 ? '<a name="'.$i.'" title="'.$img['title'].'" style=" margin:0">'.$image_min.'</a>' : '<a name="'.$i.'" title="'.$img['title'].'">'.$image_min.'</a>';
+  }
+  drupal_add_css(drupal_get_path('module', 'jcs').'/css/jcs.css');
+  return theme('jcs', array('images_show' => $images_show, 'images_min' => $images_min, 'first_title' => $first_title));
+}

@@ -1,0 +1,6 @@
+name = Jcs
+description = Jquery Coda-Slider module.
+package = Other
+core = 7.x
+
+configure = admin/config/user-interface/jcs
